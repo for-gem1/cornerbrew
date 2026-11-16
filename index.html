@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CornerBrew">
+    <meta name="theme-color" content="#120c08">
+    <title>CornerBrew: Coffee & Stories</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header Game -->
+        <header class="game-header">
+            <div class="header-left">
+                <span class="shop-badge" id="hud-shop-name">CornerBrew</span>
+                <span class="barista-name" id="hud-barista">Barista</span>
+            </div>
+            <div class="header-right">
+                <div class="stat-pill"><span class="icon">📅</span> Hari <strong id="hud-day">1</strong></div>
+                <div class="stat-pill"><span class="icon">⏰</span> <strong id="hud-time">07:00</strong></div>
+                <div class="stat-pill highlight"><span class="icon">💵</span> <strong id="hud-cash">Rp 100.000</strong></div>
+            </div>
+        </header>
+
+        <!-- Dynamic Event Alert Banner -->
+        <div id="event-banner" class="event-banner hidden">
+            <span id="event-text">☀️ Cuaca Cerah - Hari yang bagus untuk menyeduh!</span>
+        </div>
+
+        <!-- Main Workspace -->
+        <main class="game-body">
+            <!-- Customer Section -->
+            <section class="customer-section card">
+                <div class="customer-avatar-box">
+                    <div class="avatar-circle" id="cust-avatar">☕</div>
+                    <div class="patience-wrapper">
+                        <div class="patience-fill" id="cust-patience"></div>
+                    </div>
+                </div>
+                <div class="customer-dialog">
+                    <div class="cust-header">
+                        <strong id="cust-name">Menunggu Pelanggan...</strong>
+                        <span class="order-tag" id="cust-tag">Standby</span>
+                    </div>
+                    <div class="speech-bubble" id="cust-dialog-text">
+                        Tekan "Buka Kedai" atau tunggu pembeli pertama datang.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Station Menyeduh -->
+            <section class="brew-section card">
+                <div class="brew-header">
+                    <span>Meja Racik</span>
+                    <span class="recipe-hint" id="recipe-hint">Resep: -</span>
+                </div>
+
+                <div class="brew-workspace">
+                    <!-- Gauge Hold Extraction -->
+                    <div class="extraction-gauge-box">
+                        <div class="gauge-label">Presisi Ekstraksi</div>
+                        <div class="gauge-bar-bg">
+                            <div class="gauge-perfect-zone" id="gauge-zone"></div>
+                            <div class="gauge-needle" id="gauge-needle"></div>
+                        </div>
+                        <button class="btn-hold" id="btn-extract-hold">
+                            🛑 Tahan untuk Brew Espresso
+                        </button>
+                    </div>
+
+                    <!-- Visual Gelas -->
+                    <div class="cup-container">
+                        <div class="cup">
+                            <div class="liquid-layer liquid-milk" id="layer-milk"></div>
+                            <div class="liquid-layer liquid-aren" id="layer-aren"></div>
+                            <div class="liquid-layer liquid-water" id="layer-water"></div>
+                            <div class="liquid-layer liquid-espresso" id="layer-espresso"></div>
+                            <div class="cup-label" id="cup-contents-text">Gelas Kosong</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tombol Bahan -->
+                <div class="ingredients-grid">
+                    <button class="ing-btn" data-ing="espresso">☕ Espresso (<span id="stk-espresso">0</span>g)</button>
+                    <button class="ing-btn" data-ing="water">💧 Air Panas</button>
+                    <button class="ing-btn" data-ing="milk">🥛 Susu UHT (<span id="stk-milk">0</span>ml)</button>
+                    <button class="ing-btn" data-ing="aren">🍯 Gula Aren (<span id="stk-aren">0</span>ml)</button>
+                    <button class="ing-btn" data-ing="ice">🧊 Es Batu</button>
+                    <button class="ing-btn" id="btn-ing-matcha" data-ing="matcha" style="display:none;">🍵 Matcha</button>
+                </div>
+
+                <!-- Action Cup -->
+                <div class="cup-actions">
+                    <button class="btn btn-reset" id="btn-discard">🗑️ Buang</button>
+                    <button class="btn btn-serve" id="btn-serve">📤 Sajikan Pesanan</button>
+                </div>
+            </section>
+
+            <!-- Stock & Quick Info -->
+            <section class="inventory-bar card">
+                <div class="inv-item">🫘 Biji: <strong id="inv-beans">500g</strong></div>
+                <div class="inv-item">🥛 Susu: <strong id="inv-milk">1000ml</strong></div>
+                <div class="inv-item">🍯 Aren: <strong id="inv-aren">500ml</strong></div>
+                <div class="inv-item">🥤 Cup: <strong id="inv-cups">50 pcs</strong></div>
+            </section>
+        </main>
+
+        <!-- Navigasi Bawah -->
+        <footer class="bottom-nav">
+            <button class="nav-btn" id="nav-restock">📦 Belanja Stok</button>
+            <button class="nav-btn" id="nav-shop">🏬 Upgrade Kedai</button>
+            <button class="nav-btn" id="nav-minigame">🎮 Mini Game</button>
+            <button class="nav-btn primary" id="nav-toggle-shift">▶️ Buka Kedai</button>
+        </footer>
+
+        <!-- MODAL: First Setup Name -->
+        <div class="modal-overlay" id="modal-setup">
+            <div class="modal-card">
+                <h2>Selamat Datang di CornerBrew! ☕</h2>
+                <p>Mulai perjalanan kedai kopimu di sudut kota.</p>
+                <div class="form-group">
+                    <label>Nama Barista:</label>
+                    <input type="text" id="input-barista" placeholder="Contoh: Rian" value="Rian">
+                </div>
+                <div class="form-group">
+                    <label>Nama Kedai Kopi:</label>
+                    <input type="text" id="input-shop" placeholder="Contoh: CornerBrew Sudut Ruko" value="CornerBrew">
+                </div>
+                <button class="btn btn-primary full-width" id="btn-start-game">Mulai Buka Kedai</button>
+            </div>
+        </div>
+
+        <!-- MODAL: Belanja Stok -->
+        <div class="modal-overlay hidden" id="modal-restock">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>📦 Toko Bahan Groser</h3>
+                    <button class="close-btn" class="modal-close" onclick="closeModal('modal-restock')">✕</button>
+                </div>
+                <div class="shop-list">
+                    <div class="shop-item">
+                        <div>
+                            <strong>Biji Kopi Houseblend (500g)</strong>
+                            <div class="price">Rp 45.000</div>
+                        </div>
+                        <button class="btn-buy" onclick="buyStock('beans', 500, 45000)">Beli</button>
+                    </div>
+                    <div class="shop-item">
+                        <div>
+                            <strong>Susu UHT Fresh (1000ml)</strong>
+                            <div class="price">Rp 24.000</div>
+                        </div>
+                        <button class="btn-buy" onclick="buyStock('milk', 1000, 24000)">Beli</button>
+                    </div>
+                    <div class="shop-item">
+                        <div>
+                            <strong>Gula Aren Cair (500ml)</strong>
+                            <div class="price">Rp 20.000</div>
+                        </div>
+                        <button class="btn-buy" onclick="buyStock('aren', 500, 20000)">Beli</button>
+                    </div>
+                    <div class="shop-item">
+                        <div>
+                            <strong>Paper Cup & Sedotan (50 pcs)</strong>
+                            <div class="price">Rp 15.000</div>
+                        </div>
+                        <button class="btn-buy" onclick="buyStock('cups', 50, 15000)">Beli</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Upgrade Kedai -->
+        <div class="modal-overlay hidden" id="modal-shop">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>🏬 Upgrade & Peralatan Kedai</h3>
+                    <button class="close-btn" onclick="closeModal('modal-shop')">✕</button>
+                </div>
+                <div class="shop-list">
+                    <div class="shop-item">
+                        <div>
+                            <strong>Mesin Espresso Commercial</strong>
+                            <small>Ekstraksi lebih cepat & indikator hijau lebih lebar</small>
+                            <div class="price">Rp 250.000</div>
+                        </div>
+                        <button class="btn-buy" id="upg-machine" onclick="buyUpgrade('machine', 250000)">Upgrade</button>
+                    </div>
+                    <div class="shop-item">
+                        <div>
+                            <strong>Menu Matcha Latte</strong>
+                            <small>Membuka varian menu manis baru bermargin tinggi</small>
+                            <div class="price">Rp 150.000</div>
+                        </div>
+                        <button class="btn-buy" id="upg-matcha" onclick="buyUpgrade('matcha', 150000)">Buka</button>
+                    </div>
+                    <div class="shop-item">
+                        <div>
+                            <strong>WiFi Kencang & AC Kedai</strong>
+                            <small>Pelanggan 25% lebih sabar menunggu pesanan</small>
+                            <div class="price">Rp 180.000</div>
+                        </div>
+                        <button class="btn-buy" id="upg-wifi" onclick="buyUpgrade('wifi', 180000)">Pasang</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Mini Game Sort Biji Kopi -->
+        <div class="modal-overlay hidden" id="modal-minigame">
+            <div class="modal-card text-center">
+                <h3>🫘 Mini Game: Sortir Biji Kopi!</h3>
+                <p>Pilah biji kopi cacat (hitam/gelap) sebelum masuk grinder!</p>
+                <div class="minigame-timer">Sisa Waktu: <strong id="mg-timer">7</strong>s</div>
+                <div class="minigame-score">Biji Bersih: <strong id="mg-score">0</strong></div>
+                <div class="beans-grid" id="beans-grid"></div>
+                <button class="btn btn-primary full-width" id="btn-start-mg">Mulai Sortir</button>
+            </div>
+        </div>
+
+        <!-- MODAL: Rekap Tutup Shift & Feed CornerGram -->
+        <div class="modal-overlay hidden" id="modal-recap">
+            <div class="modal-card">
+                <h2>🌙 Shift Hari Selesai!</h2>
+                <div class="recap-stats">
+                    <div class="recap-row"><span>Total Pemasukan:</span><strong id="rc-income" class="green">Rp 0</strong></div>
+                    <div class="recap-row"><span>Sewa Tempat & Listrik:</span><strong class="red">-Rp 40.000</strong></div>
+                    <hr>
+                    <div class="recap-row final"><span>Kas Bersih Baru:</span><strong id="rc-net">Rp 0</strong></div>
+                </div>
+
+                <div class="feed-section">
+                    <h4>📱 Feed CornerGram & Ulasan Pembeli:</h4>
+                    <div id="recap-reviews" class="reviews-list"></div>
+                </div>
+
+                <button class="btn btn-primary full-width mt-12" id="btn-next-day">Lanjut Hari Berikutnya ➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
