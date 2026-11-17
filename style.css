@@ -1,3 +1,20 @@
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseAvatar {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes waveLiquid {
+    0% { transform: translateX(-5%); }
+    50% { transform: translateX(5%); }
+    100% { transform: translateX(-5%); }
+}
+
 :root {
     --bg-main: #120c08;
     --card-bg: #1e150f;
@@ -40,6 +57,7 @@ body {
     padding: 12px;
     gap: 10px;
     min-height: 100vh;
+    animation: fadeIn 0.4s ease-out;
 }
 
 /* Header */
@@ -51,6 +69,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .header-left { display: flex; flex-direction: column; }
@@ -64,7 +83,7 @@ body {
     border-radius: 8px;
     font-size: 11px;
 }
-.stat-pill.highlight { background: rgba(224, 169, 109, 0.15); color: var(--accent-amber); }
+.stat-pill.highlight { background: rgba(224, 169, 109, 0.15); color: var(--accent-amber); font-weight: bold; }
 
 /* Event Banner */
 .event-banner {
@@ -75,6 +94,7 @@ body {
     border-radius: 10px;
     font-size: 12px;
     text-align: center;
+    animation: fadeIn 0.3s ease;
 }
 .hidden { display: none !important; }
 
@@ -84,32 +104,37 @@ body {
     border: 1px solid var(--card-border);
     border-radius: var(--radius);
     padding: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    transition: all 0.2s ease;
 }
 
 /* Customer Section */
 .customer-section {
     display: flex;
     gap: 12px;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .avatar-circle {
-    width: 54px;
-    height: 54px;
+    width: 58px;
+    height: 58px;
     background: #2d1f16;
     border: 2px solid var(--accent-amber);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 28px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    animation: pulseAvatar 3s infinite ease-in-out;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .patience-wrapper {
-    width: 54px;
-    height: 6px;
+    width: 58px;
+    height: 7px;
     background: #332318;
-    border-radius: 3px;
+    border-radius: 4px;
     margin-top: 6px;
     overflow: hidden;
 }
@@ -118,10 +143,10 @@ body {
     height: 100%;
     width: 100%;
     background: var(--green-success);
-    transition: width 0.3s linear, background-color 0.3s;
+    transition: width 0.5s linear, background-color 0.4s ease;
 }
 
-.customer-dialog { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.customer-dialog { flex: 1; display: flex; flex-direction: column; gap: 6px; }
 .cust-header { display: flex; justify-content: space-between; align-items: center; }
 .cust-header strong { font-size: 14px; }
 .order-tag { font-size: 10px; background: var(--terracotta); padding: 2px 6px; border-radius: 6px; font-weight: bold; }
@@ -132,30 +157,56 @@ body {
     padding: 8px 10px;
     border-radius: 0 8px 8px 8px;
     font-size: 12px;
-    line-height: 1.35;
+    line-height: 1.4;
     color: #ede6d6;
+    transition: all 0.3s ease;
+}
+
+/* Recipe Banner inside Dialog */
+.recipe-guide-banner {
+    background: rgba(244, 162, 97, 0.12);
+    border: 1px solid var(--accent-gold);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--accent-gold);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
 }
 
 /* Brew Section */
 .brew-section { display: flex; flex-direction: column; gap: 10px; }
-.brew-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text-muted); }
-.recipe-hint { color: var(--accent-gold); }
+.brew-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.btn-recipe-trigger {
+    background: rgba(224, 169, 109, 0.2);
+    border: 1px solid var(--accent-amber);
+    color: var(--accent-amber);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+.btn-recipe-trigger:active { transform: scale(0.95); }
 
 .brew-workspace {
     display: grid;
-    grid-template-columns: 1fr 100px;
+    grid-template-columns: 1fr 90px;
     gap: 12px;
     align-items: center;
 }
 
 /* Gauge Hold Extractor */
 .extraction-gauge-box { display: flex; flex-direction: column; gap: 6px; }
-.gauge-label { font-size: 11px; color: var(--text-muted); }
+.gauge-label { font-size: 10px; color: var(--text-muted); line-height: 1.2; }
 
 .gauge-bar-bg {
-    height: 14px;
+    height: 16px;
     background: #2a1c13;
-    border-radius: 7px;
+    border-radius: 8px;
     position: relative;
     overflow: hidden;
     border: 1px solid var(--card-border);
@@ -163,10 +214,11 @@ body {
 
 .gauge-perfect-zone {
     position: absolute;
-    left: 65%;
-    width: 20%;
+    left: 60%;
+    width: 25%;
     height: 100%;
-    background: rgba(42, 157, 143, 0.6);
+    background: rgba(42, 157, 143, 0.65);
+    box-shadow: 0 0 8px rgba(42, 157, 143, 0.5);
 }
 
 .gauge-needle {
@@ -175,8 +227,8 @@ body {
     width: 4px;
     height: 100%;
     background: #ffffff;
-    box-shadow: 0 0 6px #fff;
-    transition: left 0.05s linear;
+    box-shadow: 0 0 8px #ffffff;
+    will-change: left;
 }
 
 .btn-hold {
@@ -188,33 +240,38 @@ body {
     font-weight: 700;
     font-size: 12px;
     cursor: pointer;
+    transition: transform 0.08s ease, background-color 0.15s ease;
 }
-.btn-hold:active { background: var(--accent-gold); color: #000; }
+.btn-hold:active { background: var(--accent-gold); color: #000; transform: scale(0.96); }
 
-/* Visual Gelas */
+/* Visual Gelas Smooth Fluid */
 .cup-container { display: flex; justify-content: center; }
 .cup {
     width: 80px;
-    height: 95px;
+    height: 100px;
     border: 3px solid var(--accent-amber);
     border-top: none;
-    border-radius: 0 0 16px 16px;
+    border-radius: 0 0 18px 18px;
     position: relative;
     overflow: hidden;
-    background: rgba(255,255,255,0.02);
+    background: rgba(255,255,255,0.03);
     display: flex;
-    align-items: flex-end;
+    flex-direction: column-reverse;
+    box-shadow: inset 0 -6px 12px rgba(0,0,0,0.5);
 }
 
 .liquid-layer {
     width: 100%;
     height: 0%;
-    transition: height 0.3s ease;
+    transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
+
 .liquid-espresso { background: #361f14; }
 .liquid-water { background: #4a6fa5; }
 .liquid-milk { background: #e3d5ca; }
 .liquid-aren { background: #7f4f24; }
+.liquid-matcha { background: #588157; }
+.liquid-ice { background: rgba(220, 242, 255, 0.65); }
 
 .cup-label {
     position: absolute;
@@ -224,9 +281,11 @@ body {
     font-size: 10px;
     text-align: center;
     width: 90%;
-    background: rgba(0,0,0,0.7);
-    padding: 2px;
+    background: rgba(0,0,0,0.75);
+    padding: 3px 2px;
     border-radius: 4px;
+    font-weight: 600;
+    pointer-events: none;
 }
 
 /* Ingredients Grid */
@@ -237,15 +296,16 @@ body {
 }
 
 .ing-btn {
-    padding: 8px 4px;
+    padding: 9px 4px;
     background: #271a12;
     border: 1px solid #3d291c;
     color: var(--text-light);
     border-radius: 8px;
     font-size: 11px;
     font-weight: 600;
+    transition: transform 0.08s ease, background-color 0.15s ease;
 }
-.ing-btn:active { background: var(--accent-amber); color: #000; }
+.ing-btn:active { background: var(--accent-amber); color: #000; transform: scale(0.94); }
 
 /* Actions */
 .cup-actions { display: flex; gap: 8px; }
@@ -257,7 +317,10 @@ body {
     font-weight: 700;
     font-size: 12px;
     color: #fff;
+    cursor: pointer;
+    transition: transform 0.08s ease;
 }
+.btn:active { transform: scale(0.95); }
 .btn-reset { background: var(--red-danger); }
 .btn-serve { background: var(--green-success); }
 .btn-primary { background: var(--accent-gold); color: #000; }
@@ -280,14 +343,17 @@ body {
 
 .nav-btn {
     flex: 1;
-    padding: 10px 4px;
+    padding: 10px 2px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     color: var(--text-light);
     border-radius: 10px;
     font-size: 11px;
     font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.08s ease, background-color 0.15s ease;
 }
+.nav-btn:active { transform: scale(0.94); }
 .nav-btn.primary { background: var(--accent-gold); color: #000; }
 
 /* Modals */
@@ -295,11 +361,13 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 16px;
     z-index: 100;
+    animation: fadeIn 0.25s ease-out;
 }
 
 .modal-card {
@@ -312,10 +380,30 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; }
-.close-btn { background: none; border: none; color: #fff; font-size: 18px; }
+.close-btn { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+
+/* Recipe Book List */
+.recipe-book-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.recipe-card-item {
+    background: #140d08;
+    border-left: 3px solid var(--accent-amber);
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+.recipe-card-item .r-title { font-weight: bold; font-size: 13px; color: var(--accent-gold); }
+.recipe-card-item .r-ingredients { font-size: 11px; margin-top: 2px; }
+.recipe-card-item .r-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 
 .form-group { display: flex; flex-direction: column; gap: 4px; text-align: left; }
 .form-group label { font-size: 12px; color: var(--text-muted); }
@@ -325,6 +413,7 @@ body {
     border: 1px solid var(--card-border);
     border-radius: 8px;
     color: #fff;
+    font-family: inherit;
 }
 
 .shop-list { display: flex; flex-direction: column; gap: 10px; }
@@ -346,6 +435,7 @@ body {
     border-radius: 6px;
     font-weight: bold;
     font-size: 11px;
+    cursor: pointer;
 }
 
 /* Minigame Grid */
@@ -363,7 +453,10 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
 }
+.bean-tile:active { transform: scale(0.9); }
 .bean-tile.bad { background: #1a100a; border: 1px dashed var(--red-danger); }
 
 /* Recap & Feed */

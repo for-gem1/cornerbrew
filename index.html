@@ -50,7 +50,12 @@
                         <span class="order-tag" id="cust-tag">Standby</span>
                     </div>
                     <div class="speech-bubble" id="cust-dialog-text">
-                        Tekan "Buka Kedai" atau tunggu pembeli pertama datang.
+                        Tekan "▶️ Buka Kedai" di bawah untuk mulai menerima pembeli.
+                    </div>
+                    <!-- Panduan Resep Otomatis -->
+                    <div class="recipe-guide-banner hidden" id="recipe-guide-banner">
+                        <span class="guide-icon">💡</span>
+                        <span class="guide-text" id="recipe-guide-text">Panduan Resep: -</span>
                     </div>
                 </div>
             </section>
@@ -58,29 +63,31 @@
             <!-- Station Menyeduh -->
             <section class="brew-section card">
                 <div class="brew-header">
-                    <span>Meja Racik</span>
-                    <span class="recipe-hint" id="recipe-hint">Resep: -</span>
+                    <span>Meja Racik Espresso & Kopi</span>
+                    <button class="btn-recipe-trigger" onclick="openModal('modal-recipes')">📖 Buku Resep</button>
                 </div>
 
                 <div class="brew-workspace">
                     <!-- Gauge Hold Extraction -->
                     <div class="extraction-gauge-box">
-                        <div class="gauge-label">Presisi Ekstraksi</div>
+                        <div class="gauge-label">Tahan tombol di bawah & lepas di zona hijau (Perfect)!</div>
                         <div class="gauge-bar-bg">
                             <div class="gauge-perfect-zone" id="gauge-zone"></div>
                             <div class="gauge-needle" id="gauge-needle"></div>
                         </div>
                         <button class="btn-hold" id="btn-extract-hold">
-                            🛑 Tahan untuk Brew Espresso
+                            🛑 Tahan untuk Extracted Espresso
                         </button>
                     </div>
 
-                    <!-- Visual Gelas -->
+                    <!-- Visual Gelas Smooth Fluid -->
                     <div class="cup-container">
-                        <div class="cup">
+                        <div class="cup" id="cup-frame">
+                            <div class="liquid-layer liquid-ice" id="layer-ice"></div>
                             <div class="liquid-layer liquid-milk" id="layer-milk"></div>
                             <div class="liquid-layer liquid-aren" id="layer-aren"></div>
                             <div class="liquid-layer liquid-water" id="layer-water"></div>
+                            <div class="liquid-layer liquid-matcha" id="layer-matcha"></div>
                             <div class="liquid-layer liquid-espresso" id="layer-espresso"></div>
                             <div class="cup-label" id="cup-contents-text">Gelas Kosong</div>
                         </div>
@@ -104,7 +111,7 @@
                 </div>
             </section>
 
-            <!-- Stock & Quick Info -->
+            <!-- Stock HUD -->
             <section class="inventory-bar card">
                 <div class="inv-item">🫘 Biji: <strong id="inv-beans">500g</strong></div>
                 <div class="inv-item">🥛 Susu: <strong id="inv-milk">1000ml</strong></div>
@@ -115,9 +122,10 @@
 
         <!-- Navigasi Bawah -->
         <footer class="bottom-nav">
-            <button class="nav-btn" id="nav-restock">📦 Belanja Stok</button>
-            <button class="nav-btn" id="nav-shop">🏬 Upgrade Kedai</button>
-            <button class="nav-btn" id="nav-minigame">🎮 Mini Game</button>
+            <button class="nav-btn" id="nav-restock">📦 Belanja</button>
+            <button class="nav-btn" id="nav-shop">🏬 Upgrade</button>
+            <button class="nav-btn" onclick="openModal('modal-recipes')">📖 Resep</button>
+            <button class="nav-btn" id="nav-minigame">🎮 Game</button>
             <button class="nav-btn primary" id="nav-toggle-shift">▶️ Buka Kedai</button>
         </footer>
 
@@ -125,7 +133,7 @@
         <div class="modal-overlay" id="modal-setup">
             <div class="modal-card">
                 <h2>Selamat Datang di CornerBrew! ☕</h2>
-                <p>Mulai perjalanan kedai kopimu di sudut kota.</p>
+                <p>Kembangkan kedai kopimu dan dengarkan kisah pelanggan.</p>
                 <div class="form-group">
                     <label>Nama Barista:</label>
                     <input type="text" id="input-barista" placeholder="Contoh: Rian" value="Rian">
@@ -138,12 +146,54 @@
             </div>
         </div>
 
+        <!-- MODAL: Buku Resep Lengkap -->
+        <div class="modal-overlay hidden" id="modal-recipes">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>📖 Panduan Buku Resep Barista</h3>
+                    <button class="close-btn" onclick="closeModal('modal-recipes')">✕</button>
+                </div>
+                <div class="recipe-book-list">
+                    <div class="recipe-card-item">
+                        <div class="r-title">☕ Espresso</div>
+                        <div class="r-ingredients">Racikan: <strong>1x Espresso</strong></div>
+                        <div class="r-desc">Kopi pekat hasil ekstrak sempurna mesin.</div>
+                    </div>
+                    <div class="recipe-card-item">
+                        <div class="r-title">💧 Americano (Panas)</div>
+                        <div class="r-ingredients">Racikan: <strong>Espresso + Air Panas</strong></div>
+                        <div class="r-desc">Kopi hitam mantap favorit pekerja lembur.</div>
+                    </div>
+                    <div class="recipe-card-item">
+                        <div class="r-title">🧊 Es Americano</div>
+                        <div class="r-ingredients">Racikan: <strong>Espresso + Air Panas + Es Batu</strong></div>
+                        <div class="r-desc">Kopi hitam dingin penyegar siang hari terik.</div>
+                    </div>
+                    <div class="recipe-card-item">
+                        <div class="r-title">🥛 Es Latte</div>
+                        <div class="r-ingredients">Racikan: <strong>Espresso + Susu UHT + Es Batu</strong></div>
+                        <div class="r-desc">Paduan espresso lembut dengan susu segar.</div>
+                    </div>
+                    <div class="recipe-card-item">
+                        <div class="r-title">🍯 Kopi Susu Aren</div>
+                        <div class="r-ingredients">Racikan: <strong>Espresso + Susu UHT + Gula Aren + Es Batu</strong></div>
+                        <div class="r-desc">Minuman favorit lokal manis gurih legit.</div>
+                    </div>
+                    <div class="recipe-card-item">
+                        <div class="r-title">🍵 Matcha Latte</div>
+                        <div class="r-ingredients">Racikan: <strong>Matcha + Susu UHT + Es Batu</strong></div>
+                        <div class="r-desc">(Butuh Upgrade Toko) Minuman non-kopi manis menenangkan.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- MODAL: Belanja Stok -->
         <div class="modal-overlay hidden" id="modal-restock">
             <div class="modal-card">
                 <div class="modal-header">
-                    <h3>📦 Toko Bahan Groser</h3>
-                    <button class="close-btn" class="modal-close" onclick="closeModal('modal-restock')">✕</button>
+                    <h3>📦 Toko Bahan Grosir</h3>
+                    <button class="close-btn" onclick="closeModal('modal-restock')">✕</button>
                 </div>
                 <div class="shop-list">
                     <div class="shop-item">
@@ -189,7 +239,7 @@
                     <div class="shop-item">
                         <div>
                             <strong>Mesin Espresso Commercial</strong>
-                            <small>Ekstraksi lebih cepat & indikator hijau lebih lebar</small>
+                            <small>Ekstraksi lebih cepat & zona hijau lebih lebar</small>
                             <div class="price">Rp 250.000</div>
                         </div>
                         <button class="btn-buy" id="upg-machine" onclick="buyUpgrade('machine', 250000)">Upgrade</button>
@@ -197,7 +247,7 @@
                     <div class="shop-item">
                         <div>
                             <strong>Menu Matcha Latte</strong>
-                            <small>Membuka varian menu manis baru bermargin tinggi</small>
+                            <small>Membuka varian menu non-kopi manis margin tinggi</small>
                             <div class="price">Rp 150.000</div>
                         </div>
                         <button class="btn-buy" id="upg-matcha" onclick="buyUpgrade('matcha', 150000)">Buka</button>
@@ -205,7 +255,7 @@
                     <div class="shop-item">
                         <div>
                             <strong>WiFi Kencang & AC Kedai</strong>
-                            <small>Pelanggan 25% lebih sabar menunggu pesanan</small>
+                            <small>Pelanggan 50% lebih sabar menunggu pesanan</small>
                             <div class="price">Rp 180.000</div>
                         </div>
                         <button class="btn-buy" id="upg-wifi" onclick="buyUpgrade('wifi', 180000)">Pasang</button>
@@ -219,7 +269,7 @@
             <div class="modal-card text-center">
                 <h3>🫘 Mini Game: Sortir Biji Kopi!</h3>
                 <p>Pilah biji kopi cacat (hitam/gelap) sebelum masuk grinder!</p>
-                <div class="minigame-timer">Sisa Waktu: <strong id="mg-timer">7</strong>s</div>
+                <div class="minigame-timer">Sisa Waktu: <strong id="mg-timer">10</strong>s</div>
                 <div class="minigame-score">Biji Bersih: <strong id="mg-score">0</strong></div>
                 <div class="beans-grid" id="beans-grid"></div>
                 <button class="btn btn-primary full-width" id="btn-start-mg">Mulai Sortir</button>
@@ -233,7 +283,7 @@
                 <div class="recap-stats">
                     <div class="recap-row"><span>Total Pemasukan:</span><strong id="rc-income" class="green">Rp 0</strong></div>
                     <div class="recap-row"><span>Sewa Tempat & Listrik:</span><strong class="red">-Rp 40.000</strong></div>
-                    <hr>
+                    <hr style="border-color: #332318; margin: 6px 0;">
                     <div class="recap-row final"><span>Kas Bersih Baru:</span><strong id="rc-net">Rp 0</strong></div>
                 </div>
 

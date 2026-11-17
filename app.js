@@ -1,4 +1,4 @@
-// Sound Synthesizer via Web Audio API
+// Web Audio API Sound Generator
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playFx(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -9,26 +9,36 @@ function playFx(type) {
 
     const now = audioCtx.currentTime;
     if (type === 'click') {
-        osc.frequency.setValueAtTime(400, now);
-        gain.gain.setValueAtTime(0.05, now);
-        osc.start(now); osc.stop(now + 0.05);
+        osc.frequency.setValueAtTime(450, now);
+        gain.gain.setValueAtTime(0.04, now);
+        osc.start(now); osc.stop(now + 0.04);
     } else if (type === 'brew') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(150, now);
-        gain.gain.setValueAtTime(0.08, now);
+        osc.frequency.setValueAtTime(160, now);
+        gain.gain.setValueAtTime(0.06, now);
         osc.start(now); osc.stop(now + 0.15);
     } else if (type === 'success') {
         osc.frequency.setValueAtTime(523, now);
         osc.frequency.exponentialRampToValueAtTime(659, now + 0.15);
-        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.setValueAtTime(0.08, now);
         osc.start(now); osc.stop(now + 0.2);
     } else if (type === 'error') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, now);
-        gain.gain.setValueAtTime(0.1, now);
+        osc.frequency.setValueAtTime(170, now);
+        gain.gain.setValueAtTime(0.08, now);
         osc.start(now); osc.stop(now + 0.25);
     }
 }
+
+// Database Recipe Cheat Sheet Guide
+const RECIPE_GUIDES = {
+    'Espresso': '☕ 1x Espresso',
+    'Americano': '☕ Espresso + 💧 Air Panas',
+    'Es Americano': '☕ Espresso + 💧 Air Panas + 🧊 Es Batu',
+    'Es Latte': '☕ Espresso + 🥛 Susu UHT + 🧊 Es Batu',
+    'Kopi Susu Aren': '☕ Espresso + 🥛 Susu UHT + 🍯 Gula Aren + 🧊 Es Batu',
+    'Matcha Latte': '🍵 Matcha + 🥛 Susu UHT + 🧊 Es Batu'
+};
 
 // Database Story & Pelanggan Relate Indonesia
 const CUSTOMER_DB = [
@@ -37,6 +47,7 @@ const CUSTOMER_DB = [
         name: 'Mas Anton',
         tag: 'ASN Lembur',
         avatar: '👨‍💼',
+        menuName: 'Americano',
         story: [
             "Deadline laporan Coretax & Excel numpuk nih bro. Butuh Americano panas tanpa gula biar mata tetap melek!",
             "Sistem baru kantor makin canggih tapi entah napa spreadsheet-ku tetep 10.000 baris. Kasih Americano ekstra pekat!",
@@ -50,8 +61,9 @@ const CUSTOMER_DB = [
         name: 'Mbak Rara',
         tag: 'Mahasiswi Skripsi',
         avatar: '👩‍🎓',
+        menuName: 'Kopi Susu Aren',
         story: [
-            "Dosen pembimbing barusan nyoret Bab 4-ku full tinta merah... Butuh Es Kopi Susu Aren manis banget buat pendorong semangat!",
+            "Dosen pembimbing barusan nyoret Bab 4-ku full tinta merah... Butuh Kopi Susu Aren manis banget buat pendorong semangat!",
             "H-2 jadwal sidang kompre. Kepala mau pecah. Bikin Kopi Susu Aren yang esnya banyak ya mas barista!",
             "LULUS REVISI!! Makasih ya mas, kopi sudut rukomu ini saksi bisu perjuanganku."
         ],
@@ -63,9 +75,10 @@ const CUSTOMER_DB = [
         name: 'Bang Doni',
         tag: 'Driver Ojol',
         avatar: '🛵',
+        menuName: 'Es Americano',
         story: [
-            "Jakarta terik banget hari ini mas! Es Kopi Hitam dingin satu ya, racik cepet mau ngejar poin tutup bonus.",
-            "Sepi orderan dari siang... Tapi ngeteh/ngopi di kedaimu selalu bikin adem. Bikinin Kopi Hitam Es ya.",
+            "Jakarta terik banget hari ini mas! Es Americano dingin satu ya, racik cepet mau ngejar poin tutup bonus.",
+            "Sepi orderan dari siang... Tapi ngeteh/ngopi di kedaimu selalu bikin adem. Bikinin Es Americano ya.",
             "Dapat tip lumayan dari penumpang tadi! Bikinin Kopi Susu Aren plus es ya mas."
         ],
         recipe: ['espresso', 'water', 'ice'],
@@ -76,6 +89,7 @@ const CUSTOMER_DB = [
         name: 'Tante Melly',
         tag: 'Ibu Kompleks',
         avatar: '👩‍🦱',
+        menuName: 'Matcha Latte',
         story: [
             "Dengar-dengar ruko sebelah mau dijual ya? Ah anyway, bikinkan Matcha Latte dingin favorit saya ya!",
             "Arisan kompleks hari ini heboh banget jeng. Saya butuh Matcha Latte biar pikiran tenang."
@@ -106,10 +120,11 @@ let state = {
     dayReviews: []
 };
 
-// Extractor Gauge Hold Logic
-let holdInterval = null;
+// 60FPS Gauge Hold Extractor Variable
+let gaugeAnimFrame = null;
 let gaugePos = 0;
 let gaugeDir = 1;
+let isHoldingGauge = false;
 
 // Init & Storage
 window.addEventListener('DOMContentLoaded', () => {
@@ -164,9 +179,9 @@ function setupEventListeners() {
     document.getElementById('nav-shop').addEventListener('click', () => openModal('modal-shop'));
     document.getElementById('nav-minigame').addEventListener('click', () => openModal('modal-minigame'));
 
-    // Hold Button Extractor
+    // Hold Button Extractor (60FPS requestAnimationFrame)
     const holdBtn = document.getElementById('btn-extract-hold');
-    holdBtn.addEventListener('touchstart', startExtractHold);
+    holdBtn.addEventListener('touchstart', startExtractHold, { passive: false });
     holdBtn.addEventListener('mousedown', startExtractHold);
     holdBtn.addEventListener('touchend', stopExtractHold);
     holdBtn.addEventListener('mouseup', stopExtractHold);
@@ -209,33 +224,42 @@ function runTimeLoop() {
     if (state.timeMinutes >= 1260) { // 21:00 Closing
         endShift();
     } else {
-        setTimeout(runTimeLoop, 1000);
+        setTimeout(runTimeLoop, 1200);
     }
 }
 
 function spawnCustomer() {
     if (!state.isShiftActive) return;
 
-    // Filter available customers
     const available = CUSTOMER_DB.filter(c => !c.reqUpgrade || state.upgrades[c.reqUpgrade]);
     const cust = available[Math.floor(Math.random() * available.length)];
     state.currentCustomer = cust;
 
     const step = state.storyStep[cust.id] % cust.story.length;
     
-    document.getElementById('cust-avatar').innerText = cust.avatar;
+    const avatarEl = document.getElementById('cust-avatar');
+    avatarEl.innerText = cust.avatar;
+    avatarEl.style.transform = 'scale(1.2)';
+    setTimeout(() => avatarEl.style.transform = 'scale(1)', 300);
+
     document.getElementById('cust-name').innerText = cust.name;
     document.getElementById('cust-tag').innerText = cust.tag;
     document.getElementById('cust-dialog-text').innerText = `"${cust.story[step]}"`;
 
-    // Reset Patience
+    // TAMPILKAN PANDUAN RESEP DENGAN JELAS
+    const guideBanner = document.getElementById('recipe-guide-banner');
+    const guideText = document.getElementById('recipe-guide-text');
+    guideBanner.classList.remove('hidden');
+    guideText.innerText = `Pesanan: ${cust.menuName} -> ${RECIPE_GUIDES[cust.menuName] || 'Lihat Buku Resep'}`;
+
+    // RESET PATIENCE - LEBIH PANJANG & TERUKUR (500ms / step = ~25-35 detik)
     state.patienceVal = 100;
     const pBar = document.getElementById('cust-patience');
     pBar.style.width = '100%';
     pBar.style.backgroundColor = '#2a9d8f';
 
     clearInterval(state.patienceTimer);
-    const speed = state.upgrades.wifi ? 300 : 220;
+    const speed = state.upgrades.wifi ? 750 : 500; // Wi-Fi & AC memberi waktu ekstra!
 
     state.patienceTimer = setInterval(() => {
         state.patienceVal -= 2;
@@ -246,37 +270,44 @@ function spawnCustomer() {
             clearInterval(state.patienceTimer);
             playFx('error');
             document.getElementById('cust-dialog-text').innerText = "Kelamaan mas! Saya batal beli deh.";
-            state.dayReviews.push({ name: cust.name, rating: 1, comment: "Layanan sangat lambat." });
+            guideBanner.classList.add('hidden');
+            state.dayReviews.push({ name: cust.name, rating: 1, comment: "Layanan terlalu lama." });
             setTimeout(spawnCustomer, 2500);
         }
     }, speed);
 }
 
-// Extractor Gauge Hold
+// 60FPS Extractor Gauge Loop
+function updateGaugeLoop() {
+    if (!isHoldingGauge) return;
+    const speed = state.upgrades.machine ? 2.5 : 1.8;
+    gaugePos += gaugeDir * speed;
+    if (gaugePos >= 100 || gaugePos <= 0) gaugeDir *= -1;
+    
+    document.getElementById('gauge-needle').style.left = `${gaugePos}%`;
+    gaugeAnimFrame = requestAnimationFrame(updateGaugeLoop);
+}
+
 function startExtractHold(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (state.inventory.beans < 15) {
-        alert("Biji kopi habis! Belanja stok dulu.");
+        alert("Biji kopi habis! Belanja stok di tombol 'Belanja' dulu.");
         return;
     }
     playFx('brew');
+    isHoldingGauge = true;
     gaugePos = 0;
-    gaugeDir = state.upgrades.machine ? 4 : 3;
-    
-    holdInterval = setInterval(() => {
-        gaugePos += gaugeDir;
-        if (gaugePos >= 100 || gaugePos <= 0) gaugeDir *= -1;
-        document.getElementById('gauge-needle').style.left = `${gaugePos}%`;
-    }, 20);
+    gaugeDir = 1;
+    gaugeAnimFrame = requestAnimationFrame(updateGaugeLoop);
 }
 
 function stopExtractHold() {
-    if (!holdInterval) return;
-    clearInterval(holdInterval);
-    holdInterval = null;
+    if (!isHoldingGauge) return;
+    isHoldingGauge = false;
+    cancelAnimationFrame(gaugeAnimFrame);
 
-    // Green zone 65% - 85%
-    if (gaugePos >= 65 && gaugePos <= 85) {
+    // Green zone 60% - 85%
+    if (gaugePos >= 60 && gaugePos <= 85) {
         state.extractedQuality = 1.3;
         playFx('success');
     } else {
@@ -303,10 +334,12 @@ function addIngredient(ing) {
 }
 
 function updateCupVisual() {
-    document.getElementById('layer-espresso').style.height = state.cupRecipe.includes('espresso') ? '30%' : '0%';
-    document.getElementById('layer-water').style.height = state.cupRecipe.includes('water') ? '60%' : '0%';
-    document.getElementById('layer-milk').style.height = state.cupRecipe.includes('milk') ? '50%' : '0%';
-    document.getElementById('layer-aren').style.height = state.cupRecipe.includes('aren') ? '20%' : '0%';
+    document.getElementById('layer-espresso').style.height = state.cupRecipe.includes('espresso') ? '25%' : '0%';
+    document.getElementById('layer-water').style.height = state.cupRecipe.includes('water') ? '55%' : '0%';
+    document.getElementById('layer-milk').style.height = state.cupRecipe.includes('milk') ? '45%' : '0%';
+    document.getElementById('layer-aren').style.height = state.cupRecipe.includes('aren') ? '18%' : '0%';
+    document.getElementById('layer-matcha').style.height = state.cupRecipe.includes('matcha') ? '40%' : '0%';
+    document.getElementById('layer-ice').style.height = state.cupRecipe.includes('ice') ? '15%' : '0%';
 
     document.getElementById('cup-contents-text').innerText = state.cupRecipe.length > 0 ? state.cupRecipe.join('+') : 'Gelas Kosong';
 }
@@ -336,6 +369,7 @@ function serveOrder() {
 
         state.storyStep[state.currentCustomer.id] += 1;
         document.getElementById('cust-dialog-text').innerText = `Mantap mas! Rasanya pas banget. (+Rp ${earned.toLocaleString('id-ID')})`;
+        document.getElementById('recipe-guide-banner').classList.add('hidden');
         state.dayReviews.push({ name: state.currentCustomer.name, rating: 5, comment: "Kopi mantap, rasanya otentik!" });
 
         discardCup();
@@ -344,7 +378,7 @@ function serveOrder() {
         setTimeout(spawnCustomer, 2000);
     } else {
         playFx('error');
-        document.getElementById('cust-dialog-text').innerText = "Kok rasanya beda sama yang saya pesan ya mas?";
+        document.getElementById('cust-dialog-text').innerText = "Racikan kurang pas mas... Coba cek Buku Resep!";
     }
 }
 
@@ -371,12 +405,12 @@ function buyUpgrade(type, price) {
 
 // Mini Game: Beans Sorting
 let mgScore = 0;
-let mgTime = 7;
+let mgTime = 10;
 let mgTimerInterval = null;
 
 function startBeansMinigame() {
     mgScore = 0;
-    mgTime = 7;
+    mgTime = 10;
     document.getElementById('mg-score').innerText = mgScore;
     document.getElementById('mg-timer').innerText = mgTime;
 
@@ -451,7 +485,9 @@ function startNextDay() {
     updateUI();
 }
 
-// PWA Service Worker Registration
+// Service Worker Registration for PWA
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+    });
 }

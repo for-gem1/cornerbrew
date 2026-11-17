@@ -1,11 +1,10 @@
-const CACHE_NAME = 'cornerbrew-v1';
+const CACHE_NAME = 'cornerbrew-v2';
 const ASSETS = [
     './',
     './index.html',
     './style.css',
     './app.js',
-    './manifest.json',
-    'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap'
+    './manifest.json'
 ];
 
 self.addEventListener('install', (e) => {
